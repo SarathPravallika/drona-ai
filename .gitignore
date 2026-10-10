@@ -219,5 +219,6 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Local design docs and Claude Code config (not committed)
-.claude/
+# Local design docs, memory, learnings (not committed); share only Spec Kit skills
+.claude/*
+!.claude/skills/
