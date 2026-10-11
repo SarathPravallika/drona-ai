@@ -1,50 +1,63 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+# drona.ai Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Rules Decide, the Model Speaks
+Every decision that changes learner state or direction (mastery, root-cause gaps, plan order,
+next question) MUST be made by a pure, unit-tested Python function in `drona/domain/`. The LLM
+MAY explain, ask questions and give feedback; it MUST NOT make or override those decisions.
+LLM self-reported confidence MUST NOT drive any decision.
+*Rationale:* code is deterministic and testable; model output is neither.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. The Human Holds the Wheel
+Agents MUST propose changes (old → new, with a reason) and a human MUST approve, edit or reject
+them before they take effect. Plans are versioned; nothing is silently overwritten.
+*Rationale:* learners and leads stay in control; every change is explainable and reversible.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Every Loop Has an Exit
+Every agent loop MUST enforce budgets for max steps, tokens and seconds. Every LLM call MUST have
+a timeout and bounded retries (transient errors only). On a budget hit, the agent MUST stop
+cleanly and report why.
+*Rationale:* prevents runaway cost, hangs and infinite loops.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Grounded or Silent
+The tutor MUST answer only from the content pack and MUST cite the source it used. If the
+content does not cover a question, it MUST say so and MUST NOT guess.
+*Rationale:* trust depends on faithfulness; citations make it checkable.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. Test-First for Domain Rules
+Tests for `drona/domain/` rules MUST be written (and fail) before the implementation, and MUST
+cover edge cases (empty input, cycles, ties, boundaries). Domain rules MUST have no I/O and no
+LLM calls.
+*Rationale:* the rules are the product's core logic; tests are their specification.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Technical Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Python 3.12 (pinned in `.python-version`), managed with uv; `uv.lock` is committed.
+- All LLM calls MUST go through `drona/llm/client.py`; no other module imports a provider SDK.
+- LLM outputs that code depends on MUST be parsed and validated into Pydantic models.
+- No agent frameworks (LangChain, LangGraph, CrewAI…) in the v0 core; the agent loop is
+  hand-written.
+- No secrets in code, logs or commits; configuration comes from the environment.
+- Pack content (notes, questions) MUST be original; external material is linked and cited in
+  `sources.yaml`, never copied wholesale.
+- New dependencies MUST be justified in the plan.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Quality Gates & Workflow
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- Every feature follows spec → plan → tasks → implement (Spec Kit).
+- Every plan MUST include a Constitution Check against Principles I–V and the constraints above;
+  any violation MUST be justified or the plan revised.
+- Solo developer for now: small commits directly on `main`, no PRs. Every commit requires
+  `uv run pytest` green and a self-reviewed diff. Revisit (feature branches + PRs) when a second
+  contributor joins.
+- Content changes (packs) follow the same review flow: content is code.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+This constitution supersedes other practices where they conflict. Amendments require a written
+reason, a version bump and a reviewed commit. Versioning: MAJOR for removing or redefining a
+principle, MINOR for a new principle or materially expanded guidance, PATCH for wording fixes.
+Every plan and review MUST verify compliance. Runtime development guidance lives in `AGENTS.md`.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2026-10-11 | **Last Amended**: 2026-10-11
