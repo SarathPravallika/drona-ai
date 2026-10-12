@@ -15,3 +15,7 @@ dependencies = [
 dev = [
     "pytest>=9.1.1",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]  # repo root on the import path, so tests can `import drona`
+testpaths = ["tests"]
