@@ -1,0 +1,47 @@
+# Agentic AI for Engineers: concepts and prerequisites (v0 slice: concepts 1–5, level 1 Foundations).
+# prerequisites = concepts a learner must know first. Must not form a loop.
+
+- id: llm-basics
+  title: LLM basics
+  summary: >-
+    How a large language model turns text into tokens, predicts the next token, and why the context
+    window and sampling settings (temperature) shape what it can see and say.
+  level: 1
+  est_minutes: 40
+  prerequisites: []
+
+- id: prompting-structured-output
+  title: Prompting & structured output
+  summary: >-
+    Writing clear instructions (system vs user messages, examples) and making the model return data
+    that fits a schema, so code can parse it instead of guessing.
+  level: 1
+  est_minutes: 45
+  prerequisites: [llm-basics]
+
+- id: tool-calling
+  title: Tool calling
+  summary: >-
+    Letting the model ask your code to run a function: describing tools with a schema, reading the
+    model's tool request, running it, and sending the result back.
+  level: 1
+  est_minutes: 45
+  prerequisites: [prompting-structured-output]
+
+- id: agent-loop
+  title: The agent loop
+  summary: >-
+    The think → act → observe cycle (ReAct) where the model repeatedly picks a tool, sees the result,
+    and decides the next step, with budgets so the loop always ends.
+  level: 1
+  est_minutes: 60
+  prerequisites: [tool-calling]
+
+- id: workflows-vs-agents
+  title: Workflows vs agents
+  summary: >-
+    When fixed, code-defined steps (a workflow) beat letting the model choose its own path (an agent),
+    and how to pick based on predictability, cost and risk.
+  level: 1
+  est_minutes: 40
+  prerequisites: [agent-loop]

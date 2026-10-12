@@ -2,6 +2,7 @@
 
 import pytest
 
+from drona.domain import graph
 from drona.domain.graph import DEFAULT_THRESHOLD, RootCauseResult, find_root_gaps
 
 LLM, PROMPT, TOOLS, LOOP, WORKFLOWS = (
@@ -186,3 +187,43 @@ def test_score_out_of_range_raises(bad_score):
     scores = {LLM: 0.9, PROMPT: 0.9, TOOLS: bad_score, LOOP: 0.2}
     with pytest.raises(ValueError, match=TOOLS):
         find_root_gaps(CHAIN, scores, LOOP)
+
+
+# ── find_cycle (spec User Story 2: loops must be caught) ────────────────────
+# Called as graph.find_cycle so these tests fail on their own while the function doesn't exist yet.
+
+
+# A map with no concepts has no loop
+# Input: Empty map
+# Output: Asserts None
+def test_cycle_empty_map_has_none():
+    assert graph.find_cycle({}) is None
+
+
+# The real v0 chain has no loop
+# Input: The 5-concept chain
+# Output: Asserts None
+def test_cycle_chain_has_none():
+    assert graph.find_cycle(CHAIN) is None
+
+
+# A concept that needs itself is a loop
+# Input: a → a
+# Output: Asserts the loop is {a}
+def test_cycle_self_loop():
+    assert set(graph.find_cycle({"a": ["a"]})) == {"a"}
+
+
+# Two concepts that need each other form a loop
+# Input: a → b → a
+# Output: Asserts the loop is {a, b}
+def test_cycle_two_nodes():
+    assert set(graph.find_cycle({"a": ["b"], "b": ["a"]})) == {"a", "b"}
+
+
+# Only the loop's members are returned, even when the loop isn't at the start of the map
+# Input: x (no loop), d → a, and a → b → c → a
+# Output: Asserts the loop is exactly {a, b, c} (not x, not d)
+def test_cycle_returns_only_loop_members():
+    prereqs = {"x": [], "d": ["a"], "a": ["b"], "b": ["c"], "c": ["a"]}
+    assert set(graph.find_cycle(prereqs)) == {"a", "b", "c"}

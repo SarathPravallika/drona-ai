@@ -26,7 +26,7 @@ implementation. Loader tests follow the same order.
 
 **Purpose**: package skeleton for the new modules
 
-- [ ] T001 Create empty package files `drona/content/__init__.py` and `drona/domain/__init__.py`
+- [x] T001 Create empty package files `drona/content/__init__.py` and `drona/domain/__init__.py`
 
 ---
 
@@ -45,7 +45,7 @@ pack files or loader; US2 builds those.
 
 ### Tests for User Story 1 (write first, must FAIL)
 
-- [ ] T002 [US1] Write `find_root_gaps` tests in `tests/test_graph.py` against the contract in
+- [x] T002 [US1] Write `find_root_gaps` tests in `tests/test_graph.py` against the contract in
   `contracts/python-api.md`, using the 5-concept chain `llm-basics → prompting-structured-output →
   tool-calling → agent-loop → workflows-vs-agents` built as a dict. One test per spec US1 scenario:
   (1) 0.9/0.3/0.4/0.2 → `['prompting-structured-output']`; (2) prerequisites ≥ 0.7, target 0.2 → `['agent-loop']`;
@@ -58,15 +58,15 @@ pack files or loader; US2 builds those.
   beneath a weak target unscored → root gap is the target, the rest in `needs_assessment`; unknown target →
   `ValueError` naming it; score 1.5 or -0.1 → `ValueError`; custom `threshold=0.5` respected;
   same inputs twice → identical results.
-- [ ] T003 [US1] Run `uv run pytest tests/test_graph.py` and confirm the tests FAIL (red: `graph.py` doesn't exist yet)
+- [x] T003 [US1] Run `uv run pytest tests/test_graph.py` and confirm the tests FAIL (red: `graph.py` doesn't exist yet)
 
 ### Implementation for User Story 1
 
-- [ ] T004 [US1] ✍️ hand-written: in `drona/domain/graph.py` implement `DEFAULT_THRESHOLD = 0.7`,
+- [x] T004 [US1] ✍️ hand-written: in `drona/domain/graph.py` implement `DEFAULT_THRESHOLD = 0.7`,
   `@dataclass(frozen=True) RootCauseResult(root_gaps: list[str], needs_assessment: list[str])` and
   `find_root_gaps(prereqs, scores, target, threshold=DEFAULT_THRESHOLD)` per research D6–D9:
   no I/O, no LLM, stdlib only
-- [ ] T005 [US1] Run `uv run pytest tests/test_graph.py` until green; refactor with tests staying green
+- [x] T005 [US1] Run `uv run pytest tests/test_graph.py` until green; refactor with tests staying green
 
 **Checkpoint**: the MVP root-cause finder works on any valid map.
 
@@ -80,37 +80,37 @@ pack files or loader; US2 builds those.
 
 ### Content
 
-- [ ] T006 [P] [US2] Create `packs/agentic-ai/pack.yaml`: `slug: agentic-ai`, `name: Agentic AI for Engineers`,
+- [x] T006 [P] [US2] Create `packs/agentic-ai/pack.yaml`: `slug: agentic-ai`, `name: Agentic AI for Engineers`,
   `version: 0.1.0`, `status: draft`, `owner` (data-model.md "Pack")
-- [ ] T007 [P] [US2] Create `packs/agentic-ai/concepts.yaml` with the 5 v0 concepts from data-model.md
+- [x] T007 [P] [US2] Create `packs/agentic-ai/concepts.yaml` with the 5 v0 concepts from data-model.md
   ("v0 concepts" table): each has `id` ("lowercase slug (a-z, 0-9, -), unique in the pack"), `title`
   ("non-empty"), `summary` ("non-empty, one or two sentences", original wording), `level` ("1–4"),
   `est_minutes` ("> 0"), `prerequisites` (the chain in FR-003)
 
 ### Tests for User Story 2 (write first, must FAIL)
 
-- [ ] T008 [US2] Add `find_cycle` tests to `tests/test_graph.py`: empty map → `None`; the v0 chain → `None`;
+- [x] T008 [US2] Add `find_cycle` tests to `tests/test_graph.py`: empty map → `None`; the v0 chain → `None`;
   self-loop `a → a`; two-node loop; three-node loop; a loop not involving the first concept; the returned
   list contains exactly the loop's members
-- [ ] T009 [P] [US2] Write `tests/test_pack_loader.py` (packs written into `tmp_path`): the real pack at
+- [x] T009 [P] [US2] Write `tests/test_pack_loader.py` (packs written into `tmp_path`): the real pack at
   `packs/agentic-ai` loads with 5 concepts in order and `prereq_map()` matches FR-003; then one test per
   broken case, each asserting `PackError` and that the message names the concept/field: unknown
   prerequisite, loop (message lists its members), duplicate id, missing `title`, `level: 5`,
   `est_minutes: 0`, id `Bad_ID`, empty `concepts.yaml`, missing `pack.yaml`
-- [ ] T010 [US2] Run `uv run pytest` and confirm the new tests FAIL (red)
+- [x] T010 [US2] Run `uv run pytest` and confirm the new tests FAIL (red)
 
 ### Implementation for User Story 2
 
-- [ ] T011 [US2] ✍️ hand-written: implement `find_cycle(prereqs) -> list[str] | None` in
+- [x] T011 [US2] ✍️ hand-written: implement `find_cycle(prereqs) -> list[str] | None` in
   `drona/domain/graph.py` using three-colour DFS (research D5)
-- [ ] T012 [P] [US2] Implement Pydantic `Concept` and `Pack` (+ `prereq_map()`) in `drona/content/models.py`
+- [x] T012 [P] [US2] Implement Pydantic `Concept` and `Pack` (+ `prereq_map()`) in `drona/content/models.py`
   with the constraints quoted in data-model.md: id "lowercase slug (a-z, 0-9, -)", level "1–4",
   est_minutes "> 0", status "draft | approved | retired", prerequisites default `[]`
-- [ ] T013 [US2] Implement `PackError(ValueError)` and `load_pack(pack_dir: Path) -> Pack` in
+- [x] T013 [US2] Implement `PackError(ValueError)` and `load_pack(pack_dir: Path) -> Pack` in
   `drona/content/pack_loader.py`: `yaml.safe_load` only (research D2); wrap Pydantic errors as `PackError`
   naming the concept and field; check empty pack, duplicate ids, unknown prerequisites, then
   `find_cycle` (research D3)
-- [ ] T014 [US2] Run `uv run pytest` until green
+- [x] T014 [US2] Run `uv run pytest` until green
 
 **Checkpoint**: real pack + root-cause finder work together (quickstart.md step 3).
 
@@ -118,7 +118,7 @@ pack files or loader; US2 builds those.
 
 ## Phase 5: Polish
 
-- [ ] T015 Run quickstart.md steps 1–4 and confirm the expected outputs
+- [x] T015 Run quickstart.md steps 1–4 and confirm the expected outputs
 - [ ] T016 Self-review the full diff (function comments present: one line + Input + Output), run
   `uv run pytest`, commit and push
 

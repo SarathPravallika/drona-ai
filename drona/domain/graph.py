@@ -90,3 +90,32 @@ def find_root_gaps(
     ]
     unscored = [c for c in in_scope if c not in scores]
     return RootCauseResult(root_gaps=deepest_first(root_gaps), needs_assessment=deepest_first(unscored))
+
+
+# Finds one prerequisite loop, if any (three-colour depth-first search, research D5)
+# Input: Prerequisite map (unknown prerequisite ids are ignored here; the loader reports them)
+# Output: The concept ids forming one loop, in walk order, or None if there are no loops
+def find_cycle(prereqs: PrereqMap) -> list[str] | None:
+    NOT_VISITED, ON_PATH, DONE = 0, 1, 2
+    state = {concept: NOT_VISITED for concept in prereqs}
+    path: list[str] = []
+
+    # Walks down from one concept; meeting a concept already on the current path means a loop
+    def visit(concept: str) -> list[str] | None:
+        state[concept] = ON_PATH
+        path.append(concept)
+        for prereq in prereqs[concept]:
+            if prereq not in state:
+                continue
+            if state[prereq] == ON_PATH:
+                return path[path.index(prereq) :]
+            if state[prereq] == NOT_VISITED and (loop := visit(prereq)):
+                return loop
+        state[concept] = DONE
+        path.pop()
+        return None
+
+    for concept in prereqs:
+        if state[concept] == NOT_VISITED and (loop := visit(concept)):
+            return loop
+    return None
